@@ -4,20 +4,21 @@ using System.IO;
 using System.Linq;
 using FileBackup.Core.Types;
 using Newtonsoft.Json;
+using Serilog.Events;
 
 namespace FileBackup.Core.Models.Implementations
 {
     public class AppConfiguration
     {
         [JsonRequired]
-        public LoggingLevel LoggingLevel { get; }
+        public LogEventLevel LoggingLevel { get; }
         [JsonRequired]
         public List<String> OriginalPath { get; }
         [JsonRequired]
         public String TargetPath { get; }
 
         [JsonConstructor]
-        private AppConfiguration(LoggingLevel loggingLevel, String[] originalPath, String targetPath)
+        private AppConfiguration(LogEventLevel loggingLevel, String[] originalPath, String targetPath)
         {
             LoggingLevel = loggingLevel;
             OriginalPath = originalPath.ToList();
