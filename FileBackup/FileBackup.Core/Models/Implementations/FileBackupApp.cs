@@ -14,10 +14,13 @@ namespace FileBackup.Core.Models.Implementations
         {
             _config = config;
             ConfigureLogger();
+
+            Log.Debug("Backup configured");
         }
 
         public void Run()
         {
+            Log.Information("Starting backup creating.");
             try
             {
                 _config.OriginalPath.ForEach(path =>
@@ -32,15 +35,19 @@ namespace FileBackup.Core.Models.Implementations
             }
             catch (FileBackupException e)
             {
-                Console.WriteLine($"Failed: {e.Message}");
+                Log.Information(e.Message);
+            }
+            catch (Exception e)
+            {
                 Log.Error(e.Message);
+                throw;
             }
         }
 
         private void ConfigureLogger()
         {
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.File("log.txt", outputTemplate: "[{Level:u3}] {Message:lj}")
+                .WriteTo.File("log.txt", outputTemplate: "[{Level:u3}] {Message:lj}\n")
                 .MinimumLevel.Is(_config.LoggingLevel)
                 .CreateLogger();
         }

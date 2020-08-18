@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using FileBackup.Core.Models.Abstractions;
 using FileBackup.Core.Types;
+using Serilog;
 
 namespace FileBackup.Core.Models.Implementations
 {
@@ -26,6 +27,8 @@ namespace FileBackup.Core.Models.Implementations
 
             CloneInnerFilesToFolder(targetFolder);
             CloneInnerFoldersToFolder(targetFolder);
+
+            Log.Information($"Folder with path {SourcePath} successfully copied");
         }
 
         public Boolean IsExists()
@@ -39,7 +42,7 @@ namespace FileBackup.Core.Models.Implementations
             {
                 Directory.CreateDirectory(SourcePath);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw FileBackupException.Folder.UnableToCreate(SourcePath);
             }
@@ -49,6 +52,8 @@ namespace FileBackup.Core.Models.Implementations
         {
             IFolder stampFolder = new LocalFolder(Path.Combine(SourcePath, "Backup_stamp_" + DateTime.Now.ToString("hh-mm-ss_dd/MM/yy")));
             stampFolder.Init();
+
+            Log.Debug("Time stamp created");
         }
 
         private void CloneInnerFilesToFolder(IFolder targetFolder)

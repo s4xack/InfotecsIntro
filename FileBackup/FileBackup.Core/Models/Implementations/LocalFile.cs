@@ -2,6 +2,7 @@
 using System.IO;
 using FileBackup.Core.Models.Abstractions;
 using FileBackup.Core.Types;
+using Serilog;
 
 namespace FileBackup.Core.Models.Implementations
 {
@@ -37,6 +38,8 @@ namespace FileBackup.Core.Models.Implementations
             {
                 throw FileBackupException.File.UnableToWrite(targetPath);
             }
+
+            Log.Debug($"File with path {SourcePath} successfully copied");
         }
     }
 }
