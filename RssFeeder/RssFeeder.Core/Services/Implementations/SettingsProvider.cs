@@ -7,15 +7,15 @@ using RssFeeder.Core.Models;
 
 namespace RssFeeder.Core.Services.Implementations
 {
-    public class ConfigurationProvider
+    public class SettingsProvider
     {
         private readonly RssFeederConfiguration _config;
 
-        public List<RssSource> Sources => _config.Sources.ToList();
+        public List<RssSource> Sources => _config.Sources;
         public Int32 RefreshTimeout => _config.RefreshTimeout;
         public Boolean IsFormatting => _config.IsFormatting;
 
-        public ConfigurationProvider(RssFeederConfiguration config)
+        public SettingsProvider(RssFeederConfiguration config)
         {
             _config = config;
         }
@@ -51,7 +51,7 @@ namespace RssFeeder.Core.Services.Implementations
             if (!IsValidRssSource(rssSourceLink))
                 return false;
 
-            _config.Sources.Add(new RssSource(rssSourceLink));
+            _config.Sources.Add(new RssSource(rssSourceLink, true));
             return true;
         }
 

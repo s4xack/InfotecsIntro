@@ -25,7 +25,7 @@ namespace RssFeeder.Core.Services.Implementations
             document.Load(rssSourceLink);
 
             XmlElement root = document.DocumentElement;
-            XmlNode chanel = root?.SelectSingleNode("chanel");
+            XmlNode chanel = root?.SelectSingleNode("channel");
             if (chanel is null)
                 throw new NotSupportedException();
 
@@ -33,23 +33,27 @@ namespace RssFeeder.Core.Services.Implementations
             if (items is null)
                 throw new NotSupportedException();
 
-            List<Feed> feed = new List<Feed>();
+            List<Feed> feeds = new List<Feed>();
             foreach (XmlElement item in items)
             {
-                feed.Add(GetRssFeed(item));
+                feeds.Add(GetRssFeed(item));
             }
 
-            return feed;
+            return feeds.Where(f => f.IsFilled()).ToList();
         }
 
         private Feed GetRssFeed(XmlNode node)
         {
+            String title = node.SelectSingleNode("title")?.InnerText;
+            String description = node.SelectSingleNode("description")?.InnerText;
+            DateTime publicationTime = DateTime.Parse(node.SelectSingleNode("pubDate")?.InnerText);
+            var link = node.SelectSingleNode("link")?.InnerText;
             Feed feed = new Feed
             (
-                node.SelectSingleNode("title")?.InnerText,
-                node.SelectSingleNode("description")?.InnerText,
-                DateTime.Parse(node.SelectSingleNode("pubdate")?.InnerText),
-                node.SelectSingleNode("link")?.InnerText
+                title,
+                description,
+                publicationTime,
+                link
             );
             return feed;
         }

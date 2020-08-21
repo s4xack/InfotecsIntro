@@ -1,0 +1,67 @@
+﻿@page "/"
+@using System.Threading
+@using RssFeeder.Core.Models
+@using RssFeeder.Core.Services.Abstractions
+@using RssFeeder.Core.Services.Implementations
+@inject IRssFeedReader RssFeedReader
+@inject SettingsProvider SettingsProvider
+<p>@_a</p>
+<div class="container">
+    @foreach(Feed feed in _feeds)
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card" width="100%">
+                    <div class="card-header">
+                        <div>
+                            <h3>
+                                <a href="@feed.Link">@feed.Title</a>
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="card-body @(_isFeedCollapsed[feed.Id] ? "collapse" : String.Empty)">
+                        @if (_isFormatting)
+                        {
+                            <p>@((MarkupString)feed.Description)</p>
+                        }
+                        else
+                        {
+                            <p>@(feed.Description)</p>
+                        }
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <div class="col-3">
+                            <strong>@feed.PublicationTime.Value.ToString("hh:mm dd.MM.yy")</strong>
+                        </div>
+                        <div class="col-3 text-right">
+                            <button class="btn btn-primary" @onclick="@(e => _isFeedCollapsed[feed.Id] = !_isFeedCollapsed[feed.Id])">Description</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code
+{
+    private List<Feed> _feeds;
+    private Dictionary<Guid, Boolean> _isFeedCollapsed;
+    private Boolean _isFormatting;
+    private Timer _refreshTimer;
+
+    protected override void OnInitialized()
+    {
+        _isFormatting = SettingsProvider.IsFormatting;
+
+        _feeds = RssFeedReader.GetFeeds(SettingsProvider.Sources);
+        _isFeedCollapsed = new Dictionary<Guid, Boolean>(_feeds.Select(f => new KeyValuePair<Guid, Boolean>(f.Id, true)));
+
+        _refreshTimer = new Timer(async e =>
+        {
+            _feeds = RssFeedReader.GetFeeds(SettingsProvider.Sources);
+            _isFeedCollapsed = new Dictionary<Guid, Boolean>(_feeds.Select(f => new KeyValuePair<Guid, Boolean>(f.Id, true)));
+            await InvokeAsync(StateHasChanged);
+        }, null, new TimeSpan(0, 0, SettingsProvider.RefreshTimeout), new TimeSpan(0, 0, SettingsProvider.RefreshTimeout));
+    }
+}

@@ -7,10 +7,10 @@ namespace RssFeeder.Core.Models
         public String Link { get; }
         public Boolean IsActive { get; set; }
 
-        public RssSource(String link)
+        public RssSource(String link, Boolean isActive)
         {
             Link = link;
-            IsActive = true;
+            IsActive = isActive;
         }
     }
 }
