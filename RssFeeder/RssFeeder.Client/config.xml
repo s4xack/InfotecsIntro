@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Settings>
-  <RefreshTimeout>20</RefreshTimeout>
+  <RefreshTimeout>200</RefreshTimeout>
   <Sources>
     <Source>
       <IsActive>true</IsActive>
-      <Link>https://habr.com/ru/rss/all/all/</Link>
+      <Link>https://habr.com/ru/rss/interesting</Link>
     </Source>
   </Sources>
   <IsFormatting>true</IsFormatting>

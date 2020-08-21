@@ -5,9 +5,9 @@
 @using RssFeeder.Core.Services.Implementations
 @inject IRssFeedReader RssFeedReader
 @inject SettingsProvider SettingsProvider
-<p>@_a</p>
+
 <div class="container">
-    @foreach(Feed feed in _feeds)
+    @foreach (Feed feed in _feeds)
     {
         <div class="row">
             <div class="col-12">
@@ -19,7 +19,7 @@
                             </h3>
                         </div>
                     </div>
-                    <div class="card-body @(_isFeedCollapsed[feed.Id] ? "collapse" : String.Empty)">
+                    <div class="card-body @(_isFeedCollapsed[feed.Id] ? CollapseStyle : NoCollapseStyle)">
                         @if (_isFormatting)
                         {
                             <p>@((MarkupString)feed.Description)</p>
@@ -31,10 +31,10 @@
                     </div>
                     <div class="card-footer d-flex justify-content-between align-items-center">
                         <div class="col-3">
-                            <strong>@feed.PublicationTime.Value.ToString("hh:mm dd.MM.yy")</strong>
+                            <button class="btn btn-primary" @onclick="@(e => _isFeedCollapsed[feed.Id] = !_isFeedCollapsed[feed.Id])">Description</button>
                         </div>
                         <div class="col-3 text-right">
-                            <button class="btn btn-primary" @onclick="@(e => _isFeedCollapsed[feed.Id] = !_isFeedCollapsed[feed.Id])">Description</button>
+                            <strong>@feed.PublicationTime.Value.ToString("hh:mm dd.MM.yy")</strong>
                         </div>
                     </div>
                 </div>
@@ -45,6 +45,9 @@
 
 @code
 {
+    private const String CollapseStyle = "collapse";
+    private const String NoCollapseStyle = "";
+
     private List<Feed> _feeds;
     private Dictionary<Guid, Boolean> _isFeedCollapsed;
     private Boolean _isFormatting;

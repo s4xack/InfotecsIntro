@@ -4,60 +4,87 @@
 @using RssFeeder.Core.Services.Implementations
 @inject SettingsProvider SettingsProvider
 
-    <div class="container" >
-        <div class="form-group row align-items-center">
-            <div class="col-9">Formatting</div>
-            <div class="col-3 text-right">
-                <button class="btn btn-primary " @onclick="@(x => SettingsProvider.ToggleFormatting())">@(SettingsProvider.IsFormatting ? "Enabled" : "Disabled" )</button>
-            </div>
-        </div>
-        <div class="form-group row align-items-center">
-            <div class="col-9">Refresh timeout</div>
-            <div class="col-3">
-                <input type="text" name="timeout" class="form-control @(!_isValidRefreshTimeout ? "border-danger" : "")" value="@SettingsProvider.RefreshTimeout" @onchange="@(e => UpdateRefreshTime(e))" />
-            </div>
-        </div>
-        <div class="form-group row align-items-center">
-            <div class="col-4">Rss source</div>
-            <div class="col-8">
-                <input type="text" name="source" value="" class="form-control @(!_isValidSource ? "border-danger" : "")" @onchange="@(e => AddRssSource(e))" />
-            </div>
-        </div>
-        <div class="form-group row align-items-center">
-            <ul class="list-group col-12">
-                @foreach (RssSource source in SettingsProvider.Sources)
-                {
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div class="col-8 ">@source.Link</div>
-                        <div class="ml-auto text-right">
-                            <input type="checkbox" name="name" checked="@source.IsActive" @onclick="@(e=> SettingsProvider.ToggleRssSource(source.Link))"/>
-                        </div>
-                        <div class="text-right">
-                            <button class="btn" @onclick="@(e=> SettingsProvider.RemoveRssSource(source.Link))">
-                                <span class="oi oi-delete"></span>
-                            </button>
-                        </div>
-                    </li>
-                }
-            </ul>
+<div class="container">
+    <div class="form-group row align-items-center">
+        <div class="col-9">Formatting</div>
+        <div class="col-3 text-right">
+            <button class="btn btn-primary " @onclick="@(x => SettingsProvider.ToggleFormatting())">@(SettingsProvider.IsFormatting ? EnabledText : DisabledText )</button>
         </div>
     </div>
+    <div class="form-group row align-items-center">
+        <div class="col-9">Refresh timeout</div>
+        <div class="col-3">
+            <input type="text" name="timeout" class="form-control @(!_isValidRefreshTimeout ? WrongValueStyle : CorrectValueStyle)" value="@SettingsProvider.RefreshTimeout" @onchange="@(e => UpdateRefreshTime(e))" />
+        </div>
+    </div>
+    <div class="form-group row align-items-center">
+        <div class="col-4">Rss source</div>
+        <div class="col-8">
+            <input type="text" name="source" value="" class="form-control @(!_isValidSource ? WrongValueStyle : CorrectValueStyle)" @onchange="@(e => AddRssSource(e))" />
+        </div>
+    </div>
+    <div class="form-group row align-items-center">
+        <ul class="list-group col-12">
+            @foreach (RssSource source in _sources)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="col-8 ">@source.Link</div>
+                    <div class="ml-auto text-right">
+                        <input type="checkbox" name="name" checked="@source.IsActive" @onclick="@(e=> ToggleRssSource(source.Link))" />
+                    </div>
+                    <div class="text-right">
+                        <button class="btn" @onclick="@(e=> RemoveRssSource(source.Link))">
+                            <span class="oi oi-delete"></span>
+                        </button>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
 
 @code
 {
+    private const String WrongValueStyle = "border-danger";
+    private const String CorrectValueStyle = "";
+
+    private const String EnabledText = "Enabled";
+    private const String DisabledText = "Disabled";
+
+
+    private List<RssSource> _sources;
+
     private bool _isValidRefreshTimeout = true;
     private bool _isValidSource = true;
 
+    protected override void OnInitialized()
+    {
+        _sources = SettingsProvider.Sources;
+    }
+
     private void UpdateRefreshTime(ChangeEventArgs args)
     {
-        if (!Int32.TryParse((String) args.Value, out Int32 newTimeout))
+        if (!Int32.TryParse((String)args.Value, out Int32 newTimeout))
             _isValidRefreshTimeout = false;
         _isValidRefreshTimeout = SettingsProvider.UpdateRefreshTimeout(newTimeout);
     }
 
     private void AddRssSource(ChangeEventArgs args)
     {
-        String link = (String) args.Value;
+        String link = (String)args.Value;
         _isValidSource = SettingsProvider.AddRssSource(link);
+        _sources = SettingsProvider.Sources;
+    }
+
+    private void ToggleRssSource(String link)
+    {
+        SettingsProvider.ToggleRssSource(link);
+        _sources = SettingsProvider.Sources;
+    }
+
+    private void RemoveRssSource(String link)
+    {
+        SettingsProvider.RemoveRssSource(link);
+        _sources = SettingsProvider.Sources;
     }
 }

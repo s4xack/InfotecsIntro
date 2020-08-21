@@ -11,7 +11,7 @@ namespace RssFeeder.Core.Services.Implementations
     {
         private readonly RssFeederConfiguration _config;
 
-        public List<RssSource> Sources => _config.Sources;
+        public List<RssSource> Sources => _config.Sources.ToList();
         public Int32 RefreshTimeout => _config.RefreshTimeout;
         public Boolean IsFormatting => _config.IsFormatting;
 
